@@ -84,6 +84,8 @@ jobs:
       with:
         python-version: '3.x'
     - uses: actions/checkout@v1
+      with:
+        submodules: true
     - run: sudo apt-get install ninja-build
     - run: make clang-debug-asan check
     - run: make clang-release-asan check
@@ -99,6 +101,8 @@ jobs:
       with:
         python-version: '3.x'
     - uses: actions/checkout@v1
+      with:
+        submodules: true
     - run: sudo apt-get install ninja-build
     - run: make clang-debug-lsan check
     - run: make clang-release-lsan check
@@ -116,6 +120,8 @@ jobs:
       with:
         python-version: '3.x'
     - uses: actions/checkout@v1
+      with:
+        submodules: true
     - run: sudo apt-get install ninja-build
     - run: make clang-debug-ubsan check
     - run: make clang-release-ubsan check
