@@ -10,7 +10,7 @@ on:
 
 jobs:
   lint:
-    name: Lint
+    name: lint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/setup-python@v1
@@ -21,7 +21,7 @@ jobs:
       run: pip3 install flake8==3.7.8
     - run: flake8
   build:
-    name: Build
+    name: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -47,6 +47,11 @@ jobs:
     - name: cmake
       run: cmake .. -G Ninja
       working-directory: out
+      if: matrix.os != 'windows-latest'
+    - name: cmake (windows)
+      run: cmake ..
+      working-directory: out
+      if: matrix.os == 'windows-latest'
     - name: build
       run: cmake --build out
     - name: unittests
@@ -56,7 +61,7 @@ jobs:
     - name: tests
       run: cmake --build out --target run-tests
   emscripten:
-    name: Emscripten
+    name: emscripten
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -67,3 +72,50 @@ jobs:
         docker run -di --name emscripten -v $(pwd):/src trzeci/emscripten:sdk-incoming-64bit bash
         docker exec emscripten emconfigure cmake .
         docker exec emscripten emmake make -j 2
+
+  # TODO(sbc): Find a way to reduce the duplicate between these sanitizer jobs
+  build-asan:
+    name: asan
+    runs-on: ubuntu-latest
+    env:
+      USE_NINJA: "1"
+    steps:
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - uses: actions/checkout@v1
+    - run: sudo apt-get install ninja-build
+    - run: make clang-debug-asan check
+    - run: make clang-release-asan check
+
+  # Duplicates build-asan.  Please keep in sync
+  build-lsan:
+    name: lsan
+    runs-on: ubuntu-latest
+    env:
+      USE_NINJA: "1"
+    steps:
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - uses: actions/checkout@v1
+    - run: sudo apt-get install ninja-build
+    - run: make clang-debug-lsan check
+    - run: make clang-release-lsan check
+
+  # Duplicates build-asan.  Please keep in sync
+  build-ubsan:
+    name: ubsan
+    runs-on: ubuntu-latest
+    env:
+      COMPILER: "clang"
+      SANITIZER: "ubsan"
+      USE_NINJA: "1"
+    steps:
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - uses: actions/checkout@v1
+    - run: sudo apt-get install ninja-build
+    - run: make clang-debug-ubsan check
+    - run: make clang-release-ubsan check
