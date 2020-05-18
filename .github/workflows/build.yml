@@ -87,6 +87,8 @@ jobs:
       with:
         submodules: true
     - run: sudo apt-get install ninja-build
+    - run: make clang-debug-asan
+    - run: make clang-release-asan
     - run: make test-clang-debug-asan
     - run: make test-clang-release-asan
 
@@ -104,6 +106,8 @@ jobs:
       with:
         submodules: true
     - run: sudo apt-get install ninja-build
+    - run: make clang-debug-lsan
+    - run: make clang-release-lsan
     - run: make test-clang-debug-lsan
     - run: make test-clang-release-lsan
 
@@ -123,5 +127,7 @@ jobs:
       with:
         submodules: true
     - run: sudo apt-get install ninja-build
+    - run: make clang-debug-ubsan
+    - run: make clang-release-ubsan
     - run: make test-clang-debug-ubsan
     - run: make test-clang-release-ubsan
